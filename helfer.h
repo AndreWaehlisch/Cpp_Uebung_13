@@ -193,9 +193,8 @@ class Matrix
 	int mm;
 	T **v;
 
-	Matrix(const Matrix& rhs);
-
 	public:
+	Matrix(const Matrix& rhs);
 	Matrix(void);
 	Matrix(int n, int m);
 	Matrix(int n, int m, const T& a);

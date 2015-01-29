@@ -3,8 +3,6 @@
 #include <iostream>
 #include "helfer.h" 
 
-
-
 using namespace std; 
 
 VecDoub a(const VecDoub& a, const VecDoub& b)
@@ -27,9 +25,6 @@ VecDoub m(const double& f,const VecDoub& a)
     p[i] = f*a[i]; 
   return p; 
 }
-
-
-
 
 template <class T>
 void solver 
@@ -97,6 +92,5 @@ int main()
       
       cout << endl; 
       solver<Lorentz>(l.ystart,t,h,l); 
-    } 
-  
+    }   
 }
