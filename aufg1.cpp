@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <limits>
 #include <iostream>
+#include <fstream>
 #include "helfer.h" 
 
 using namespace std; 
@@ -64,7 +65,22 @@ public:
       B[0] = b1; 
       B[1] = b2; 
       B[2] = b3; 
-    }
+  }
+  
+  void reset (double x1, double x2, double x3, double v1, double v2, double v3, double b1, double b2, double b3) 
+  {
+    //Anfangspositionen 
+    ystart[0] = x1; 
+    ystart[1] = x2; 
+    ystart[2] = x3; 
+    //Anfangsgeschwindigkeiten 
+    ystart[3] = v1; 
+    ystart[4] = v2; 
+    ystart[5] = v3; 
+    B[0] = b1; 
+    B[1] = b2; 
+    B[2] = b3; 
+  }
 
   void operator () ( const double t, const VecDoub& y, VecDoub& dydt) 
   {
@@ -81,16 +97,58 @@ int main()
 {
   Lorentz l(0,0,0,1,0,0,1,3,-1); 
   double t = 0; 
-  double h = .01; 
+  double tmax[] = {10,100,1e4};
+  double h; 
+  int N; 
   double a[] = {0.,0.,0.,1.,0.,0.,1.,3.,-1.}; 
+  double vbetrag, veps, delta; 
   VecDoub y(6,a); 
+ 
+  //ofstream file1("lorentz_1.txt",ios::trunc);  
+  //ofstream file2("lorentz_2.txt",ios::trunc);  
+  //ofstream file3("lorentz_3.txt",ios::trunc);  
+  
+  vbetrag = sqrt(l.ystart[3]*l.ystart[3] +  l.ystart[4]*l.ystart[4] +  l.ystart[5]*l.ystart[5]); 
+  veps = .01 * vbetrag; 
 
-  for(t = 0; t < 10; t+=h)
+ 
+  for ( int i = 0 ; i < 3; i++) 
     {
-      for (int i = 0; i < 6; i++) 
-	cout << l.ystart[i] << " " ; 
-      
-      cout << endl; 
-      solver<Lorentz>(l.ystart,t,h,l); 
-    }   
+      N = 1; 
+      delta = veps + 1;       
+      while ( delta > veps ) 
+	{
+	  delta = veps + 1; 
+	  h = tmax[i] / N; 
+	  //	  cout << i << " "<< h << endl;
+	  for(t = 0; t <= tmax[i]; t+=h)
+	    solver<Lorentz>(l.ystart,t,h,l); 
+	  
+	  delta = abs(vbetrag - sqrt(l.ystart[3]*l.ystart[3] +  l.ystart[4]*l.ystart[4] +  l.ystart[5]*l.ystart[5]));
+	  l.reset(0,0,0,1,0,0,1,3,-1); 
+	  N++; 
+	}
+      cout << N << endl; 
+    }
 }
+
+/*
+  
+      if ( t <= 100 )
+	{
+	  for (int i = 0; i < 6; i++) 
+	    file2 << l.ystart[i] << " " ; 
+	  file2 << endl; 
+	}
+      
+      for (int i = 0; i < 6; i++) 
+	file3 << l.ystart[i] << " " ; 
+      file3 << endl; 
+      solver<Lorentz>(l.ystart,t,h,l); 
+    } 
+
+  file1.close(); 
+  file2.close(); 
+  file3.close(); 
+*/
+
